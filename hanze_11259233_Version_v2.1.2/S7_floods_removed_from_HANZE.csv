@@ -1,0 +1,30 @@
+﻿ID,Country code,Year,Country name,Start date,End date,Type,Flood source,Regions affected (v2010),Regions affected (v2021),Area inundated,Fatalities,Persons affected,Losses (nominal value),Losses (original currency),"Losses (mln EUR, 2011)",Cause,Notes,References,Explanation
+23,AT,2009,Austria,16/07/2009,19/07/2009,Flash,Raababach,AT221,,,0,,,,,Extreme rainfall,,EM-DAT; EEA (2015); Brakenridge (2022),Lack of specific loss data
+74,CY,1985,Cyprus,29/05/1985,29/05/1985,Flash,,CY000,,,1,,,,,Extreme rainfall,,Munich Re (2017),"Heavy rainfall and hailstorm, but fatality was caused by whirlwind (http://www.ijmet.org/wp-content/uploads/2016/04/102.pdf)"
+157,FR,1952,France,22/04/1952,24/04/1952,River,Var,FR823,,,11,,,,,Heavy rainfall up to 307 mm in 3 days,,AERMC (2011); Meteo France (2022),Event was a landslide
+207,FR,1993,France,05/10/1993,07/10/1993,River,Rhone,FR823,,,3,,"830,000,000",FRF,163,Heavy rainfall throughout September and October,,EEA (2015); Meteo France (2022),Merged with 208
+236,FR,2000,France,02/12/2000,02/12/2000,Flash,,FR103,,,0,600,,,,Extreme rainfall,,EM-DAT,Urban flood
+425,HU,2016,Hungary,21/06/2016,21/06/2016,Flash,,HU323,,,0,"2,282",,,,Extreme rainfall,,EM-DAT,Event was a hailstorm (https://go.ifrc.org/emergencies/231#reports)
+426,IS,1988,Iceland,29/08/1988,29/08/1988,River,,IS002,,,0,280,,,,Snowmelt,,EM-DAT,Event was a mudslide (https://reliefweb.int/report/iceland/iceland-heavy-rainsmudslides-aug-1988-undro-information-report-1)
+443,IE,2013,Ireland,25/07/2013,26/07/2013,Flash,,IE011;IE013;IE021;IE022,,,0,,"90,000,000",EUR,86,Extreme rainfall,,Munich Re (2017),Urban flood
+665,IT,1953,Italy,25/10/1953,29/10/1953,Flash,Malina; Degano,ITF61;ITH41;ITH42,,,4,,,,,Extreme rainfall,,CNR (2023),Merged with 665
+675,IT,1955,Italy,07/03/1955,07/03/1955,Coastal,Ionian Sea,ITG17,,,0,150,,,,Storm surge,,CNR (2023),200 or less persons affected
+917,IT,1995,Italy,24/08/1995,24/08/1995,Flash,Pescara; Salinello,ITF12;ITF13,,,0,100,,,,Extreme rainfall,,CNR (2023),200 or less persons affected (only ITF12 was actually affected)
+946,IT,2000,Italy,14/11/2000,14/11/2000,Flash,Parma,ITH52,,,0,500,,,,Extreme rainfall,,CNR (2023),Merged with 945
+953,IT,2002,Italy,24/11/2002,24/11/2002,Flash,,ITC33,,,1,,,,,Extreme rainfall,,CNR (2023),Merged with 952
+964,IT,2005,Italy,22/10/2005,22/10/2005,Flash,Minissale,ITG17,,,1,,,,,Extreme rainfall,,Regione Siciliana (2021),Merged with 965
+966,IT,2006,Italy,30/04/2006,30/04/2006,Flash,,ITF33,,,4,,,,,Extreme rainfall,,Wikipedia (2023b),Event was a landslide
+980,IT,2011,Italy,03/03/2011,03/03/2011,Flash,,ITI35,,,5,,,,,Extreme rainfall,,Wikipedia (2023b),Merged with 979
+1025,NO,2001,Norway,01/12/2001,01/12/2001,Flash,,NO042,,,0,"1,500",,,,Extreme rainfall,,EM-DAT,Urban flood
+1056,PL,2001,Poland,09/07/2001,10/07/2001,Flash,Radunia; Kłodawa,PL635,,,4,650,"251,600,000",PLN,80,"Extreme rainfall, up to 90 mm in 4 hours",Urban flood in Gdańsk,Brakenridge (2022); Nowicka (2005); Bednarczyk et al. (2006); KZGW (2011),Merged with 1057
+1095,PT,1966,Portugal,02/12/1966,02/12/1966,Flash,,PT112;PT113;PT114;PT115;PT117;PT118;PT16B;PT171,,,1,108,,,,Extreme rainfall,Also landslides,Zezere et al. (2014),Merged with 1094
+1079,PT,1943,Portugal,23/09/1943,23/09/1943,Flash,,PT16B;PT171,,,0,110,,,,Extreme rainfall,,Zezere et al. (2014),200 or less persons affected (only PT171 was actually affected)
+1088,PT,1956,Portugal,24/03/1956,24/03/1956,Flash,,PT114;PT115;PT117;PT118,,,0,102,,,,Extreme rainfall,,Zezere et al. (2014),200 or less persons affected (only PT114 and PT118 were actually affected)
+1102,PT,1983,Portugal,21/11/1983,21/11/1983,Flash,,PT172;PT181,,,0,141,,,,Extreme rainfall,,Zezere et al. (2014),Merged with 1101
+1109,PT,2000,Portugal,05/03/2000,05/03/2000,Flash,,PT16B;PT171,,,0,139,,,,Extreme rainfall,,Zezere et al. (2014),200 or less persons affected (only PT171 was actually affected)
+1113,PT,2001,Portugal,06/02/2001,08/02/2001,River,,PT114;PT115;PT117;PT118;PT162;PT163;PT164;PT16B;PT171;PT172;PT181,,,0,114,,,,Heavy rainfall,Also landslides,Zezere et al. (2014),"200 or less persons affected (only PT114, PT117, PT162 and PT16B were actually affected)"
+1116,PT,2003,Portugal,02/01/2003,03/01/2003,Flash,,PT115;PT116;PT117;PT161;PT162;PT164;PT165,,,0,118,,,,Extreme rainfall,Also landslides,EM-DAT; Zezere et al. (2014),Merged with 1115
+1140,RO,2002,Romania,30/07/2002,03/08/2002,Flash,,RO223;RO225;RO317,,,4,"3,900",,,,Extreme rainfall,,EM-DAT; Brakenridge (2022),Merged with 1139
+1152,RO,2006,Romania,13/03/2006,07/04/2006,River,Siret,RO215;RO411;RO413,,32,6,"17,071",,,,Heavy rainfall and snowmelt,"Includes 10,000 evacuated due to risk of dam break",EM-DAT; Brakenridge (2017); EEA (2015),Merged with 1153
+1154,RO,2006,Romania,19/06/2006,19/06/2006,River,,RO125;RO226,,,1,600,,,,Heavy rainfall,,EM-DAT,Merged with 1155
+1327,ES,1987,Spain,03/09/1987,03/09/1987,Flash,,ES513,,,6,,,,,Extreme rainfall,,Munich Re (2017); EEA (2015),Duplicate with 1326
