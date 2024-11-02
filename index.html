@@ -240,12 +240,56 @@
     function displayRecords(records, yearRange) {
         const statsTable = document.getElementById('statsTable');
         statsTable.innerHTML = `<h5 class="mt-4 text-center">Detailed Records (Count: ${records.length}, Year Range: ${yearRange})</h5><table class="table table-striped table-sm mt-3"><thead class="table-light"><tr>` +
-            Object.keys(records[0]).map(key => `<th>${key}</th>`).join('') +
+            Object.keys(records[0]).map(key => `<th class="sortable" data-key="${key}">${key}</th>`).join('') +
             '</tr></thead><tbody>' +
             records.map(record => '<tr>' +
                 Object.values(record).map(value => `<td>${value}</td>`).join('') +
                 '</tr>').join('') +
             '</tbody></table>';
+
+        // Add click event listener to table headers for sorting
+        document.querySelectorAll('.sortable').forEach(header => {
+            header.addEventListener('click', function () {
+                const key = this.getAttribute('data-key');
+               const sortedRecords = [...records].sort((a, b) => {
+                    let aValue = a[key];
+                    let bValue = b[key];
+
+                    if (key === "Start date" || key === "End date") {
+                        aValue = new Date(aValue);
+                        bValue = new Date(bValue);
+                    } else {
+                        aValue = isNaN(aValue) ? aValue : parseFloat(aValue);
+                        bValue = isNaN(bValue) ? bValue : parseFloat(bValue);
+                    }
+
+                    if (aValue < bValue) return -1;
+                    if (aValue > bValue) return 1;
+
+                    // make NaN always less
+                    if (isNaN(aValue) && isNaN(bValue)) return 0;
+                    if (isNaN(aValue)) return -1;
+                    if (isNaN(bValue)) return 1;
+                    return 0;
+                });
+
+                // Toggle sorting direction
+                if (this.classList.contains('asc')) {
+                    sortedRecords.reverse();
+                    this.classList.remove('asc');
+                    this.classList.add('desc');
+                } else {
+                    this.classList.remove('desc');
+                    this.classList.add('asc');
+                }
+
+                // Update the table body with sorted records
+                const tbody = statsTable.querySelector('tbody');
+                tbody.innerHTML = sortedRecords.map(record => '<tr>' +
+                    Object.values(record).map(value => `<td>${value}</td>`).join('') +
+                    '</tr>').join('');
+            });
+        });
     }
 
     // Update the chart when the time lapse selection, data option, or dataset changes
