@@ -19,6 +19,30 @@
             <option value="15">15 Years</option>
             <option value="20">20 Years</option>
         </select>
+        <div class="form-check ms-3">
+            <input class="form-check-input" type="radio" name="chartDataOption" id="optionOccurrences" value="occurrences" checked>
+            <label class="form-check-label" for="optionOccurrences">
+                Count of Occurrences
+            </label>
+        </div>
+        <div class="form-check ms-3">
+            <input class="form-check-input" type="radio" name="chartDataOption" id="optionFatalities" value="totalFatalities">
+            <label class="form-check-label" for="optionFatalities">
+                Total Fatalities
+            </label>
+        </div>
+        <div class="form-check ms-3">
+            <input class="form-check-input" type="radio" name="chartDataOption" id="optionPersonsAffected" value="totalPersonsAffected">
+            <label class="form-check-label" for="optionPersonsAffected">
+                Total Persons Affected
+            </label>
+        </div>
+        <div class="form-check ms-3">
+            <input class="form-check-input" type="radio" name="chartDataOption" id="optionLosses" value="totalLosses">
+            <label class="form-check-label" for="optionLosses">
+                Total Losses
+            </label>
+        </div>
     </div>
     <div id="statsTable"></div>
     <canvas id="floodChart" class="my-4"></canvas>
@@ -93,17 +117,24 @@
         });
 
         // Render chart with the processed flood data
-        renderFloodChart(floodCounts);
+        renderFloodChart(yearlyStats, floodCounts);
     }
 
-    function renderFloodChart(floodCounts) {
+    function renderFloodChart(yearlyStats, floodCounts) {
         const ctx = document.getElementById('floodChart').getContext('2d');
         const timeLapse = parseInt(document.getElementById('timeLapse').value);
-        const groupedCounts = groupByTimeLapse(floodCounts, timeLapse);
+        const selectedOption = document.querySelector('input[name="chartDataOption"]:checked').value;
+        let dataToPlot = {};
+
+        if (selectedOption === 'occurrences') {
+            dataToPlot = groupByTimeLapse(floodCounts, timeLapse);
+        } else {
+            dataToPlot = groupByTimeLapse(yearlyStats, timeLapse, selectedOption);
+        }
 
         // Get sorted years and counts to match
-        const years = Object.keys(groupedCounts).sort((a, b) => a - b);
-        const counts = years.map(year => groupedCounts[year]);
+        const years = Object.keys(dataToPlot).sort((a, b) => a - b);
+        const counts = years.map(year => dataToPlot[year]);
 
         // Destroy the previous chart instance if it exists
         if (floodChartInstance) {
@@ -116,7 +147,7 @@
             data: {
                 labels: years,
                 datasets: [{
-                    label: `Number of Floods (Grouped by ${timeLapse} Year(s))`,
+                    label: `${selectedOption.charAt(0).toUpperCase() + selectedOption.slice(1)} (Grouped by ${timeLapse} Year(s))`,
                     data: counts,
                     backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     borderColor: 'rgba(75, 192, 192, 1)',
@@ -136,26 +167,34 @@
         });
     }
 
-    function groupByTimeLapse(floodCounts, timeLapse) {
-        const groupedCounts = {};
-        const years = Object.keys(floodCounts).map(year => parseInt(year)).sort((a, b) => a - b);
+    function groupByTimeLapse(data, timeLapse, key = null) {
+        const groupedData = {};
+        const years = Object.keys(data).map(year => parseInt(year)).sort((a, b) => a - b);
 
         years.forEach(year => {
             const groupYear = Math.floor(year / timeLapse) * timeLapse;
-            if (!groupedCounts[groupYear]) {
-                groupedCounts[groupYear] = 0;
+            if (!groupedData[groupYear]) {
+                groupedData[groupYear] = 0;
             }
-            groupedCounts[groupYear] += floodCounts[year];
+            groupedData[groupYear] += key ? (data[year][key] || 0) : data[year];
         });
 
-        return groupedCounts;
+        return groupedData;
     }
 
-    // Update the chart when the time lapse selection changes
+    // Update the chart when the time lapse selection or data option changes
     document.getElementById('timeLapse').addEventListener('change', function () {
         if (parsedCSVData) {
             processCSVData(parsedCSVData); // Use already parsed CSV data for faster processing
         }
+    });
+
+    document.querySelectorAll('input[name="chartDataOption"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (parsedCSVData) {
+                processCSVData(parsedCSVData); // Use already parsed CSV data for faster processing
+            }
+        });
     });
 </script>
 </body>
