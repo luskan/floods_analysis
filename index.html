@@ -82,6 +82,7 @@
 
     let parsedCSVData = null; // Store parsed CSV data
     let floodChartInstance = null;
+    let lastSelectedCountry = null;
 
     function loadCountriesFromData(data) {
         const countryFilter = document.getElementById('countryFilter');
@@ -96,13 +97,13 @@
             else if (row['Country'] && row['OtherCountry']) {
                 // darthmouth data
                 if (row['OtherCountry'] == '0')
-                	countrySet.add(row['Country']);
+                    countrySet.add(row['Country']);
                 else
                     countrySet.add(row['OtherCountry']);
             }
         });
 
-        fetch('data/countries.csv')
+        return fetch('data/countries.csv')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Network response was not ok: ${response.statusText}`);
@@ -119,10 +120,12 @@
                             console.error("CSV Parsing Errors:", results.errors);
                         } else {
                             const countryFilter = document.getElementById('countryFilter');
+                            const countryCodesSet = new Set();
                             results.data.forEach(row => {
                                 if (row['Name'] && row['Code']) {
                                     // Check if row['Name'] exists in countrySet
                                     if (countrySet.has(row['Name'])) {
+                                        countryCodesSet.add(row['Code']);
                                         const option = document.createElement('option');
                                         option.value = row['Code'];
                                         option.textContent = row['Name'];
@@ -130,6 +133,15 @@
                                     }
                                 }
                             });
+
+                            if (lastSelectedCountry && countryCodesSet.has(lastSelectedCountry)) {
+                                countryFilter.value = lastSelectedCountry;
+                            }
+                            else {
+                                countryFilter.value = 'all';
+                                lastSelectedCountry = null;
+                            }
+
                         }
                     }
                 });
@@ -166,8 +178,10 @@
                             console.error("CSV Parsing Errors:", results.errors);
                         } else {
                             parsedCSVData = results.data;
-                            loadCountriesFromData(parsedCSVData); // Load countries based on parsed data
-                            processCSVData(parsedCSVData, selectedDataSet); // Process data after parsing
+                            loadCountriesFromData(parsedCSVData).then(() => {
+                                // Process data after parsing, this allows to use reselected country
+                                processCSVData(parsedCSVData, selectedDataSet);
+                            });
                         }
                     }
                 });
@@ -375,6 +389,8 @@
     });
 
     document.getElementById('dataSet').addEventListener('change', function () {
+         lastSelectedCountry = document.getElementById('countryFilter').value;
+
         loadData();
         // Clear the records list
         document.getElementById('statsTable').innerHTML = '';
