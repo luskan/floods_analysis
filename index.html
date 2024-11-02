@@ -213,8 +213,13 @@
                     if (elements.length > 0) {
                         const elementIndex = elements[0].index;
                         const selectedYear = years[elementIndex];
-                        const records = yearlyStats[selectedYear].records;
-                        const yearRange = `${selectedYear} - ${parseInt(selectedYear) + timeLapse - 1}`;
+                        const yearStart = parseInt(selectedYear);
+                        const yearEnd = yearStart + timeLapse - 1;
+                        const records = Object.values(yearlyStats).flatMap(stat => {
+                            const year = parseInt(stat.records[0]?.Year || stat.records[0]?.Began?.substring(0, 4));
+                            return (year >= yearStart && year <= yearEnd) ? stat.records : [];
+                        });
+                        const yearRange = `${yearStart} - ${yearEnd}`;
                         displayRecords(records, yearRange);
                     }
                 }
@@ -251,7 +256,7 @@
         document.querySelectorAll('.sortable').forEach(header => {
             header.addEventListener('click', function () {
                 const key = this.getAttribute('data-key');
-               const sortedRecords = [...records].sort((a, b) => {
+                const sortedRecords = [...records].sort((a, b) => {
                     let aValue = a[key];
                     let bValue = b[key];
 
