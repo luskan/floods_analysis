@@ -70,7 +70,6 @@
 <!-- Custom JS -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        loadCountries();
         loadData();
         // Disable 'Total Losses' option initially if 'dartmouth' dataset is selected
         const isDartmouth = document.getElementById('dataSet').value === 'dartmouth';
@@ -84,7 +83,25 @@
     let parsedCSVData = null; // Store parsed CSV data
     let floodChartInstance = null;
 
-    function loadCountries() {
+    function loadCountriesFromData(data) {
+        const countryFilter = document.getElementById('countryFilter');
+        countryFilter.innerHTML = '<option value="all">All Countries</option>'; // Reset country options
+
+        const countrySet = new Set();
+        data.forEach(row => {
+            if (row['Country code'] && row['Country name']) {
+                // hanza data
+                countrySet.add(row['Country name']);
+            }
+            else if (row['Country'] && row['OtherCountry']) {
+                // darthmouth data
+                if (row['OtherCountry'] == '0')
+                	countrySet.add(row['Country']);
+                else
+                    countrySet.add(row['OtherCountry']);
+            }
+        });
+
         fetch('data/countries.csv')
             .then(response => {
                 if (!response.ok) {
@@ -104,10 +121,13 @@
                             const countryFilter = document.getElementById('countryFilter');
                             results.data.forEach(row => {
                                 if (row['Name'] && row['Code']) {
-                                    const option = document.createElement('option');
-                                    option.value = row['Code'];
-                                    option.textContent = row['Name'];
-                                    countryFilter.appendChild(option);
+                                    // Check if row['Name'] exists in countrySet
+                                    if (countrySet.has(row['Name'])) {
+                                        const option = document.createElement('option');
+                                        option.value = row['Code'];
+                                        option.textContent = row['Name'];
+                                        countryFilter.appendChild(option);
+                                    }
                                 }
                             });
                         }
@@ -146,6 +166,7 @@
                             console.error("CSV Parsing Errors:", results.errors);
                         } else {
                             parsedCSVData = results.data;
+                            loadCountriesFromData(parsedCSVData); // Load countries based on parsed data
                             processCSVData(parsedCSVData, selectedDataSet); // Process data after parsing
                         }
                     }
@@ -355,6 +376,8 @@
 
     document.getElementById('dataSet').addEventListener('change', function () {
         loadData();
+        // Clear the records list
+        document.getElementById('statsTable').innerHTML = '';
         // Disable 'Total Losses' option if 'dartmouth' dataset is selected
         const isDartmouth = document.getElementById('dataSet').value === 'dartmouth';
         const lossesOption = document.getElementById('optionLosses');
