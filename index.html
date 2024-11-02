@@ -23,6 +23,9 @@
             <option value="15">15 Years</option>
             <option value="20">20 Years</option>
         </select>
+        <select id="countryFilter" class="form-select w-auto ms-3">
+            <option value="all">All Countries</option>
+        </select>
         <div class="form-check ms-3">
             <input class="form-check-input" type="radio" name="chartDataOption" id="optionOccurrences" value="occurrences" checked>
             <label class="form-check-label" for="optionOccurrences">
@@ -67,6 +70,7 @@
 <!-- Custom JS -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        loadCountries();
         loadData();
         // Disable 'Total Losses' option initially if 'dartmouth' dataset is selected
         const isDartmouth = document.getElementById('dataSet').value === 'dartmouth';
@@ -79,6 +83,41 @@
 
     let parsedCSVData = null; // Store parsed CSV data
     let floodChartInstance = null;
+
+    function loadCountries() {
+        fetch('data/countries.csv')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                // Parse the CSV using PapaParse
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function (results) {
+                        if (results.errors.length) {
+                            console.error("CSV Parsing Errors:", results.errors);
+                        } else {
+                            const countryFilter = document.getElementById('countryFilter');
+                            results.data.forEach(row => {
+                                if (row['Name'] && row['Code']) {
+                                    const option = document.createElement('option');
+                                    option.value = row['Code'];
+                                    option.textContent = row['Name'];
+                                    countryFilter.appendChild(option);
+                                }
+                            });
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error loading the countries CSV file:', error);
+            });
+    }
 
     function loadData() {
         const selectedDataSet = document.getElementById('dataSet').value;
@@ -101,6 +140,7 @@
                 // Parse the CSV using PapaParse
                 Papa.parse(csvText, {
                     header: true,
+                    skipEmptyLines: true,
                     complete: function (results) {
                         if (results.errors.length) {
                             console.error("CSV Parsing Errors:", results.errors);
@@ -119,11 +159,20 @@
     function processCSVData(data, dataset) {
         const yearlyStats = {};
         const floodCounts = {};
+        const selectedCountry = document.getElementById('countryFilter').value;
+        const selectedCountryName = document.querySelector(`#countryFilter option[value="${selectedCountry}"]`).textContent;
 
         // Loop through data and aggregate by year
         data.forEach(row => {
             if (Object.values(row).every(val => val === '')) {
                 return; // Skip empty line but do not end iteration
+            }
+
+            if (selectedCountry !== 'all'
+                && row["Country code"] !== selectedCountry
+                && row["Country"]?.replace(/"/g, '') !== selectedCountryName)
+            {
+                return; // Skip rows that do not match the selected country
             }
 
             let year;
@@ -297,7 +346,7 @@
         });
     }
 
-    // Update the chart when the time lapse selection, data option, or dataset changes
+    // Update the chart when the time lapse selection, data option, dataset, or country filter changes
     document.getElementById('timeLapse').addEventListener('change', function () {
         if (parsedCSVData) {
             processCSVData(parsedCSVData, document.getElementById('dataSet').value); // Use already parsed CSV data for faster processing
@@ -312,6 +361,12 @@
         lossesOption.disabled = isDartmouth;
         if (isDartmouth && lossesOption.checked) {
             document.getElementById('optionOccurrences').checked = true;
+        }
+    });
+
+    document.getElementById('countryFilter').addEventListener('change', function () {
+        if (parsedCSVData) {
+            processCSVData(parsedCSVData, document.getElementById('dataSet').value); // Use already parsed CSV data for faster processing
         }
     });
 
