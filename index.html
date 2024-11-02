@@ -47,6 +47,12 @@
                 Total Losses
             </label>
         </div>
+        <div class="form-check ms-3">
+            <input class="form-check-input" type="checkbox" id="chartTypeToggle" value="alternate">
+            <label class="form-check-label" for="chartTypeToggle">
+                Use Pie Chart
+            </label>
+        </div>
     </div>
     <canvas id="floodChart" class="my-4"></canvas>
     <div id="statsTable" class="table-responsive small"></div>
@@ -160,6 +166,7 @@
         const ctx = document.getElementById('floodChart').getContext('2d');
         const timeLapse = parseInt(document.getElementById('timeLapse').value);
         const selectedOption = document.querySelector('input[name="chartDataOption"]:checked').value;
+        const usePieChart = document.getElementById('chartTypeToggle').checked;
         let dataToPlot = {};
 
         if (selectedOption === 'occurrences') {
@@ -177,21 +184,24 @@
             floodChartInstance.destroy();
         }
 
+        // Determine chart type based on checkbox
+        const chartType = usePieChart ? 'pie' : 'bar';
+
         // Create a new chart instance
         floodChartInstance = new Chart(ctx, {
-            type: 'bar',
+            type: chartType,
             data: {
                 labels: years,
                 datasets: [{
                     label: `${selectedOption.charAt(0).toUpperCase() + selectedOption.slice(1)} (Grouped by ${timeLapse} Year(s))`,
                     data: counts,
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: usePieChart ? years.map(() => `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`) : 'rgba(75, 192, 192, 0.6)',
+                    borderColor: usePieChart ? years.map(() => `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`) : 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
-                scales: {
+                scales: usePieChart ? {} : {
                     x: {
                         beginAtZero: true
                     },
@@ -262,6 +272,12 @@
                 processCSVData(parsedCSVData, document.getElementById('dataSet').value); // Use already parsed CSV data for faster processing
             }
         });
+    });
+
+    document.getElementById('chartTypeToggle').addEventListener('change', function () {
+        if (parsedCSVData) {
+            processCSVData(parsedCSVData, document.getElementById('dataSet').value); // Update chart with new type
+        }
     });
 </script>
 </body>
