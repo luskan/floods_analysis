@@ -48,8 +48,8 @@
             </label>
         </div>
     </div>
-    <div id="statsTable"></div>
     <canvas id="floodChart" class="my-4"></canvas>
+    <div id="statsTable" class="table-responsive small"></div>
 </div>
 
 <!-- Bootstrap JS -->
@@ -132,7 +132,8 @@
                     yearlyStats[year] = {
                         totalFatalities: 0,
                         totalPersonsAffected: 0,
-                        totalLosses: 0
+                        totalLosses: 0,
+                        records: []
                     };
                     floodCounts[year] = 0;
                 }
@@ -147,6 +148,7 @@
                     yearlyStats[year].totalPersonsAffected += parseInt(row["Displaced"]) || 0;
                     floodCounts[year] += 1; // Count each flood
                 }
+                yearlyStats[year].records.push(row);
             }
         });
 
@@ -196,6 +198,15 @@
                     y: {
                         beginAtZero: true
                     }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const elementIndex = elements[0].index;
+                        const selectedYear = years[elementIndex];
+                        const records = yearlyStats[selectedYear].records;
+                        const yearRange = `${selectedYear} - ${parseInt(selectedYear) + timeLapse - 1}`;
+                        displayRecords(records, yearRange);
+                    }
                 }
             }
         });
@@ -214,6 +225,17 @@
         });
 
         return groupedData;
+    }
+
+    function displayRecords(records, yearRange) {
+        const statsTable = document.getElementById('statsTable');
+        statsTable.innerHTML = `<h5 class="mt-4 text-center">Detailed Records (Count: ${records.length}, Year Range: ${yearRange})</h5><table class="table table-striped table-sm mt-3"><thead class="table-light"><tr>` +
+            Object.keys(records[0]).map(key => `<th>${key}</th>`).join('') +
+            '</tr></thead><tbody>' +
+            records.map(record => '<tr>' +
+                Object.values(record).map(value => `<td>${value}</td>`).join('') +
+                '</tr>').join('') +
+            '</tbody></table>';
     }
 
     // Update the chart when the time lapse selection, data option, or dataset changes
