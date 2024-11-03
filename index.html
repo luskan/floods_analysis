@@ -31,19 +31,25 @@
     <ul>
         <li>HANZE - The dataset presents the total number of floods by type that have occurred in 42 European countries from 1870 to 2020. Additionally, it present the average annual flood deaths per million persons.
             <ul>
+                <li><a href="https://naturalhazards.eu/">https://naturalhazards.eu/</a></li>
+                <li>Attribution: <a href="https://naturalhazards.eu/attribution">https://naturalhazards.eu/attribution</a></li>
                 <li><a href="https://www.eea.europa.eu/data-and-maps/data/external/hanze-database-of-historical-flood" target="_blank">European Environment Agency</a></li>
                 <li><a href="https://zenodo.org/records/11259233" target="_blank">Zenodo Record</a></li>
                 <li><a href="https://naturalhazards.eu/list-of-references" target="_blank">Natural Hazards References</a></li>
             </ul>
-            <p class="text-muted">Creative Commons Attribution 4.0 International</p>
+            <p class="text-muted">License: Creative Commons Attribution 4.0 International</p>
         </li>
-        <li>Dartmouth Flood Observatory
+        <li>Dartmouth Flood Observatory - Global Active Archive of Large Flood Events, 1985-Present
             <ul>
                 <li><a href="https://floodobservatory.colorado.edu/index.html" target="_blank">Dartmouth Flood Observatory Official Site</a></li>
-                <li><a href="https://floodobservatory.colorado.edu/Archives/index.html" target="_blank">Dartmouth Flood Observatory Archives</a></li>
+                <li><a href="https://floodobservatory.colorado.edu/temp/" target="_blank">Archives</a></li>
+                <li id="dartmouthSavedDateTime"></li>
+                <li id="dartmouthLastModified"></li>
             </ul>
-            <p class="text-muted">The Global Active Archive is made available without charge for scholarly research and education purposes.</p>
+            <p class="text-muted">License: The Global Active Archive is made available without charge for scholarly research and education purposes.</p>
         </li>
+        <li>With question related to the data, please contact the respective data sources.</li>
+        <li>With question related to this web application, please contact the author: <a href="mailto:marcinje@gmail.com>">Marcin Jędrzejewski</a></li>
     </ul>
     <div class="d-flex mb-3">
         <select id="dataSet" class="form-select w-auto">
@@ -113,6 +119,14 @@
         if (isDartmouth && lossesOption.checked) {
             document.getElementById('optionOccurrences').checked = true;
         }
+
+        fetch('data/dartmouth_flood_observatory/FloodArchive_version.json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('dartmouthSavedDateTime').textContent = `Saved Date Time: ${data.saved_date_time}`;
+                document.getElementById('dartmouthLastModified').textContent = `Server timestamp: ${data.server_last_modified}`;
+            })
+            .catch(error => console.error('Error loading Dartmouth version info:', error));
     });
 
     let parsedCSVData = null; // Store parsed CSV data
