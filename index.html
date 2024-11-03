@@ -18,14 +18,36 @@
         td:not(:empty):not([data-no-wrap]) {
             word-break: keep-all;
         }
+        .table-responsive {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
 <div class="container mt-5">
     <h1 class="text-center">Flood Yearly Statistics</h1>
+    <p class="mt-3">Information on the sources:</p>
+    <ul>
+        <li>HANZE - The dataset presents the total number of floods by type that have occurred in 42 European countries from 1870 to 2020. Additionally, it present the average annual flood deaths per million persons.
+            <ul>
+                <li><a href="https://www.eea.europa.eu/data-and-maps/data/external/hanze-database-of-historical-flood" target="_blank">European Environment Agency</a></li>
+                <li><a href="https://zenodo.org/records/11259233" target="_blank">Zenodo Record</a></li>
+                <li><a href="https://naturalhazards.eu/list-of-references" target="_blank">Natural Hazards References</a></li>
+            </ul>
+            <p class="text-muted">Creative Commons Attribution 4.0 International</p>
+        </li>
+        <li>Dartmouth Flood Observatory
+            <ul>
+                <li><a href="https://floodobservatory.colorado.edu/index.html" target="_blank">Dartmouth Flood Observatory Official Site</a></li>
+                <li><a href="https://floodobservatory.colorado.edu/Archives/index.html" target="_blank">Dartmouth Flood Observatory Archives</a></li>
+            </ul>
+            <p class="text-muted">The Global Active Archive is made available without charge for scholarly research and education purposes.</p>
+        </li>
+    </ul>
     <div class="d-flex mb-3">
         <select id="dataSet" class="form-select w-auto">
-            <option value="hanza">HANZA Dataset</option>
+            <option value="hanze">HANZE Dataset</option>
             <option value="dartmouth">Dartmouth Flood Observatory</option>
         </select>
         <select id="timeLapse" class="form-select w-auto ms-3">
@@ -69,6 +91,7 @@
             </label>
         </div>
     </div>
+    <div class="text-muted">Click on a bars to see data records below it.</div>
     <canvas id="floodChart" class="my-4"></canvas>
     <div id="statsTable" class="table-responsive small"></div>
 </div>
@@ -103,7 +126,7 @@
         const countrySet = new Set();
         data.forEach(row => {
             if (row['Country code'] && row['Country name']) {
-                // hanza data
+                // hanze data
                 countrySet.add(row['Country name']);
             }
             else if (row['Country'] && row['OtherCountry']) {
@@ -167,10 +190,10 @@
         const selectedDataSet = document.getElementById('dataSet').value;
         let filePath = '';
 
-        if (selectedDataSet === 'hanza') {
-            filePath = 'data/hanza_11259233_Version_v2.1.2_events.csv';
+        if (selectedDataSet === 'hanze') {
+            filePath = 'data/HANZE/hanze_11259233_Version_v2.1.2_events.csv';
         } else if (selectedDataSet === 'dartmouth') {
-            filePath = 'data/dartmouth_flood_observatory_02_10_2024.csv';
+            filePath = 'data/dartmouth_flood_observatory/FloodArchive.txt';
         }
 
         fetch(filePath)
@@ -223,7 +246,7 @@
             }
 
             let year;
-            if (dataset === 'hanza') {
+            if (dataset === 'hanze') {
                 year = parseInt(row["Year"]);
             } else if (dataset === 'dartmouth') {
                 year = parseInt(row["Began"].substring(0, 4));
@@ -240,7 +263,7 @@
                     floodCounts[year] = 0;
                 }
 
-                if (dataset === 'hanza') {
+                if (dataset === 'hanze') {
                     yearlyStats[year].totalFatalities += parseInt(row["Fatalities"]) || 0;
                     yearlyStats[year].totalPersonsAffected += parseInt(row["Persons affected"]) || 0;
                     yearlyStats[year].totalLosses += parseFloat(row["Losses (2020 euro)"]) || 0;
