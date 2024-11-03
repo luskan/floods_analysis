@@ -377,7 +377,7 @@
 
     function displayRecords(records, yearRange) {
         const statsTable = document.getElementById('statsTable');
-        statsTable.innerHTML = `<h5 class="mt-4 text-center">Detailed Records (Count: ${records.length}, Year Range: ${yearRange})</h5><table class="table table-striped table-sm mt-3"><thead class="table-light"><tr>` +
+        statsTable.innerHTML = `<h5 class="mt-4 text-center">Detailed Records (Count: ${records.length}, Year Range: ${yearRange})</h5><h6 class="text-muted">(Click on headers to sort)</h6><table class="table table-striped table-sm mt-3"><thead class="table-light"><tr>` +
             Object.keys(records[0]).map(key => `<th class="sortable" data-key="${key}">${key}</th>`).join('') +
             '</tr></thead><tbody>' +
             records.map(record => '<tr>' +
