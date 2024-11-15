@@ -20,9 +20,22 @@
         td:not(:empty):not([data-no-wrap]) {
             word-break: keep-all;
         }
+        #loadingIcon {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
+<div id="loadingIcon">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 <div class="container mt-5">
     <h1 class="text-center">Flood Yearly Statistics</h1>
     <button class="btn btn-primary mb-3" id="toggleDetailsButton">Show details</button>
@@ -49,7 +62,7 @@
                 <p class="text-muted">License: The Global Active Archive is made available without charge for scholarly research and education purposes.</p>
             </li>
             <li>With questions related to the data, please contact the respective data sources.</li>
-            <li>With q<questionsaq></questionsaq> related to this web application, please contact the author: <a href="mailto:marcinje@gmail.com">Marcin Jędrzejewski</a></li>
+            <li>With questions related to this web application, please contact the author: <a href="mailto:marcinje@gmail.com">Marcin Jędrzejewski</a></li>
         </ul>
     </div>
     <div class="d-flex mb-3">
@@ -117,6 +130,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        showLoadingIcon();
         loadData();
         // Disable 'Total Losses' option initially if 'dartmouth' dataset is selected
         const isDartmouth = document.getElementById('dataSet').value === 'dartmouth';
@@ -131,8 +145,12 @@
             .then(data => {
                 document.getElementById('dartmouthSavedDateTime').textContent = `Saved Date Time: ${data.saved_date_time}`;
                 document.getElementById('dartmouthLastModified').textContent = `Server timestamp: ${data.server_last_modified}`;
+                hideLoadingIcon();
             })
-            .catch(error => console.error('Error loading Dartmouth version info:', error));
+            .catch(error => {
+                console.error('Error loading Dartmouth version info:', error);
+                hideLoadingIcon();
+            });
 
         // Toggle visibility of data sources
         const toggleButton = document.getElementById('toggleDetailsButton');
@@ -152,7 +170,16 @@
     let floodChartInstance = null;
     let lastSelectedCountry = null;
 
+    function showLoadingIcon() {
+        document.getElementById('loadingIcon').style.display = 'block';
+    }
+
+    function hideLoadingIcon() {
+        document.getElementById('loadingIcon').style.display = 'none';
+    }
+
     function loadCountriesFromData(data) {
+        showLoadingIcon();
         const countryFilter = document.getElementById('countryFilter');
         countryFilter.innerHTML = '<option value="all">All Countries</option>'; // Reset country options
 
@@ -237,15 +264,21 @@
                             }
 
                         }
+                        hideLoadingIcon();
                     }
                 });
             })
+            .then(() => {
+                displayRecords(parsedCSVData, 'All Years');
+            })
             .catch(error => {
                 console.error('Error loading the countries CSV file:', error);
+                hideLoadingIcon();
             });
     }
 
     function loadData() {
+        showLoadingIcon();
         const selectedDataSet = document.getElementById('dataSet').value;
         let filePath = '';
 
@@ -289,10 +322,10 @@
                                 }
                             });
 
-
                             loadCountriesFromData(parsedCSVData).then(() => {
                                 // Process data after parsing, this allows to use reselected country
                                 processCSVData(parsedCSVData, selectedDataSet);
+                                hideLoadingIcon();
                             });
                         }
                     }
@@ -302,7 +335,7 @@
                 console.error('Error loading the CSV file:', error);
             })
             .then(() => {
-
+				hideLoadingIcon();
             }
         );
 
@@ -379,6 +412,8 @@
         const usePieChart = document.getElementById('chartTypeToggle').checked;
         let dataToPlot = {};
 
+        showLoadingIcon();
+
         if (selectedOption === 'occurrences') {
             dataToPlot = groupByTimeLapse(floodCounts, timeLapse);
         } else {
@@ -435,6 +470,8 @@
                 }
             }
         });
+
+        hideLoadingIcon();
     }
 
     function groupByTimeLapse(data, timeLapse, key = null) {
@@ -453,6 +490,8 @@
     }
 
     function displayRecords(records, yearRange) {
+        showLoadingIcon();
+
         const statsTable = document.getElementById('statsTable');
         statsTable.innerHTML = `<h5 class="mt-4 text-center">Detailed Records (Count: ${records.length}, Year Range: ${yearRange})</h5>
             <table id="dataTable" class="table table-striped table-sm mt-3">
@@ -476,7 +515,10 @@
             lengthChange: true,
             pageLength: 10
         });
+
+        hideLoadingIcon();
     }
+
     // Update the chart when the time lapse selection, data option, dataset, or country filter changes
     document.getElementById('timeLapse').addEventListener('change', function () {
         if (parsedCSVData) {
