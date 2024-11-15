@@ -39,6 +39,7 @@
 <div class="container mt-5">
     <h1 class="text-center">Flood Yearly Statistics</h1>
     <button class="btn btn-primary mb-3" id="toggleDetailsButton">Show details</button>
+    <button class="btn btn-secondary mb-3 ms-2" id="resetButton">Reset</button>
     <div id="dataSources" style="display: none;">
         <p class="mt-3">Information on the sources:</p>
         <ul>
@@ -113,7 +114,14 @@
     </div>
     <div class="text-muted">Click on a bars to see data records below it.</div>
     <canvas id="floodChart" class="my-4"></canvas>
+    <div class="form-check ms-3">
+        <input class="form-check-input" type="checkbox" id="showAllRecordsToggle" value="alternate">
+        <label class="form-check-label" for="chartTypeToggle">
+            Allow to show non-filtered records (may be slow)
+        </label>
+    </div>
     <div id="statsTable" class="table-responsive small"></div>
+    </br>
 </div>
 
 <!-- jQuery -->
@@ -145,7 +153,6 @@
             .then(data => {
                 document.getElementById('dartmouthSavedDateTime').textContent = `Saved Date Time: ${data.saved_date_time}`;
                 document.getElementById('dartmouthLastModified').textContent = `Server timestamp: ${data.server_last_modified}`;
-                hideLoadingIcon();
             })
             .catch(error => {
                 console.error('Error loading Dartmouth version info:', error);
@@ -164,11 +171,25 @@
                 toggleButton.textContent = 'Show details';
             }
         });
+
+        // Reset button functionality
+        const resetButton = document.getElementById('resetButton');
+        resetButton.addEventListener('click', function () {
+            showLoadingIcon();
+            document.getElementById('dataSet').value = 'hanze';
+            document.getElementById('timeLapse').value = '1';
+            document.getElementById('countryFilter').value = 'all';
+            document.getElementById('optionOccurrences').checked = true;
+            document.getElementById('chartTypeToggle').checked = false;
+            document.getElementById('showAllRecordsToggle').checked = false;
+            loadData();
+        });
     });
 
     let parsedCSVData = null; // Store parsed CSV data
     let floodChartInstance = null;
     let lastSelectedCountry = null;
+    let currentYearRangeInRecords = 'All Years';
 
     function showLoadingIcon() {
         document.getElementById('loadingIcon').style.display = 'block';
@@ -335,9 +356,9 @@
                 console.error('Error loading the CSV file:', error);
             })
             .then(() => {
-				hideLoadingIcon();
-            }
-        );
+                    //hideLoadingIcon();
+                }
+            );
 
     }
 
@@ -346,13 +367,13 @@
         const floodCounts = {};
         const selectedCountry = document.getElementById('countryFilter').value;
         const selectedCountryName = document.querySelector(`#countryFilter option[value="${selectedCountry}"]`).textContent;
+        const filteredData = [];
 
         // Loop through data and aggregate by year
         data.forEach(row => {
             if (Object.values(row).every(val => val === '')) {
                 return; // Skip empty line but do not end iteration
             }
-
 
             if (selectedCountry !== 'all') {
                 if (dataset === 'hanze') {
@@ -368,6 +389,8 @@
                 }
 
             }
+
+            filteredData.push(row);
 
             let year;
             if (dataset === 'hanze') {
@@ -403,6 +426,7 @@
 
         // Render chart with the processed flood data
         renderFloodChart(yearlyStats, floodCounts);
+        displayRecords(filteredData, 'All Years');
     }
 
     function renderFloodChart(yearlyStats, floodCounts) {
@@ -490,6 +514,15 @@
     }
 
     function displayRecords(records, yearRange) {
+        currentYearRangeInRecords = yearRange;
+        if (yearRange === 'All Years') {
+            const showAllRecordsToggle = document.getElementById('showAllRecordsToggle').checked;
+            if (!showAllRecordsToggle) {
+                document.getElementById('statsTable').innerHTML = '';
+                return;
+            }
+        }
+
         showLoadingIcon();
 
         const statsTable = document.getElementById('statsTable');
@@ -544,7 +577,12 @@
     document.getElementById('countryFilter').addEventListener('change', function () {
         if (parsedCSVData) {
             // Clear the records list
+            if (document.getElementById('countryFilter').value === 'all') {
+                currentYearRangeInRecords === 'All Years'
+            }
+
             document.getElementById('statsTable').innerHTML = '';
+            showLoadingIcon();
             processCSVData(parsedCSVData, document.getElementById('dataSet').value); // Use already parsed CSV data for faster processing
         }
     });
@@ -564,6 +602,22 @@
             processCSVData(parsedCSVData, document.getElementById('dataSet').value); // Update chart with new type
         }
     });
+
+    document.getElementById('showAllRecordsToggle').addEventListener('change', function () {
+        if (parsedCSVData) {
+            const showAllRecordsToggle = document.getElementById('showAllRecordsToggle').checked;
+            if (currentYearRangeInRecords === 'All Years') {
+                if (showAllRecordsToggle) {
+                    displayRecords(parsedCSVData, 'All Years');
+                }
+                else {
+                    // hide stats table
+                    document.getElementById('statsTable').innerHTML = '';
+                }
+            }
+        }
+    });
+
 </script>
 </body>
 </html>
