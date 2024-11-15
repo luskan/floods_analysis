@@ -281,7 +281,7 @@
                                     }
 
                                     if (key === 'Country' || key === 'OtherCountry') {
-                                        row[key] = row[key].replace(/\.$/g, '');
+                                        row[key] = row[key].replace(/\.$/g, '').trim();
                                     }
                                 }
                             });
@@ -325,7 +325,7 @@
                     }
                 }
                 else if ( dataset === 'dartmouth') {
-                    if (row["Country"] !== selectedCountry && row["OtherCountry"] !== selectedCountry)
+                    if (row["Country"] !== selectedCountryName && row["OtherCountry"] !== selectedCountryName)
                     {
                         return; // Skip rows that do not match the selected country
                     }
