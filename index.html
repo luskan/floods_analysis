@@ -1,10 +1,3 @@
----
-theme: jekyll-theme-minimal
-layout: default
-title: Flood Yearly Statistics
-description: Yearly statistics on floods across Europe and beyond.
----
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,30 +27,33 @@ description: Yearly statistics on floods across Europe and beyond.
 <body>
 <div class="container mt-5">
     <h1 class="text-center">Flood Yearly Statistics</h1>
-    <p class="mt-3">Information on the sources:</p>
-    <ul>
-        <li>HANZE - The dataset presents the total number of floods by type that have occurred in 42 European countries from 1870 to 2020. Additionally, it present the average annual flood deaths per million persons.
-            <ul>
-                <li><a href="https://naturalhazards.eu/">https://naturalhazards.eu/</a></li>
-                <li>Attribution: <a href="https://naturalhazards.eu/attribution">https://naturalhazards.eu/attribution</a></li>
-                <li><a href="https://www.eea.europa.eu/data-and-maps/data/external/hanze-database-of-historical-flood" target="_blank">European Environment Agency</a></li>
-                <li><a href="https://zenodo.org/records/11259233" target="_blank">Zenodo Record</a></li>
-                <li><a href="https://naturalhazards.eu/list-of-references" target="_blank">Natural Hazards References</a></li>
-            </ul>
-            <p class="text-muted">License: Creative Commons Attribution 4.0 International</p>
-        </li>
-        <li>Dartmouth Flood Observatory - Global Active Archive of Large Flood Events, 1985-Present
-            <ul>
-                <li><a href="https://floodobservatory.colorado.edu/index.html" target="_blank">Dartmouth Flood Observatory Official Site</a></li>
-                <li><a href="https://floodobservatory.colorado.edu/temp/" target="_blank">Archives</a></li>
-                <li id="dartmouthSavedDateTime"></li>
-                <li id="dartmouthLastModified"></li>
-            </ul>
-            <p class="text-muted">License: The Global Active Archive is made available without charge for scholarly research and education purposes.</p>
-        </li>
-        <li>With question related to the data, please contact the respective data sources.</li>
-        <li>With question related to this web application, please contact the author: <a href="mailto:marcinje@gmail.com">Marcin Jędrzejewski</a></li>
-    </ul>
+    <button class="btn btn-primary mb-3" id="toggleDetailsButton">Show details</button>
+    <div id="dataSources" style="display: none;">
+        <p class="mt-3">Information on the sources:</p>
+        <ul>
+            <li>HANZE - The dataset presents the total number of floods by type that have occurred in 42 European countries from 1870 to 2020. Additionally, it present the average annual flood deaths per million persons.
+                <ul>
+                    <li><a href="https://naturalhazards.eu/">https://naturalhazards.eu/</a></li>
+                    <li>Attribution: <a href="https://naturalhazards.eu/attribution">https://naturalhazards.eu/attribution</a></li>
+                    <li><a href="https://www.eea.europa.eu/data-and-maps/data/external/hanze-database-of-historical-flood" target="_blank">European Environment Agency</a></li>
+                    <li><a href="https://zenodo.org/records/11259233" target="_blank">Zenodo Record</a></li>
+                    <li><a href="https://naturalhazards.eu/list-of-references" target="_blank">Natural Hazards References</a></li>
+                </ul>
+                <p class="text-muted">License: Creative Commons Attribution 4.0 International</p>
+            </li>
+            <li>Dartmouth Flood Observatory - Global Active Archive of Large Flood Events, 1985-Present
+                <ul>
+                    <li><a href="https://floodobservatory.colorado.edu/index.html" target="_blank">Dartmouth Flood Observatory Official Site</a></li>
+                    <li><a href="https://floodobservatory.colorado.edu/temp/" target="_blank">Archives</a></li>
+                    <li id="dartmouthSavedDateTime"></li>
+                    <li id="dartmouthLastModified"></li>
+                </ul>
+                <p class="text-muted">License: The Global Active Archive is made available without charge for scholarly research and education purposes.</p>
+            </li>
+            <li>With question related to the data, please contact the respective data sources.</li>
+            <li>With question related to this web application, please contact the author: <a href="mailto:marcinje@gmail.com">Marcin Jędrzejewski</a></li>
+        </ul>
+    </div>
     <div class="d-flex mb-3">
         <select id="dataSet" class="form-select w-auto">
             <option value="hanze">HANZE Dataset</option>
@@ -134,6 +130,19 @@ description: Yearly statistics on floods across Europe and beyond.
                 document.getElementById('dartmouthLastModified').textContent = `Server timestamp: ${data.server_last_modified}`;
             })
             .catch(error => console.error('Error loading Dartmouth version info:', error));
+
+        // Toggle visibility of data sources
+        const toggleButton = document.getElementById('toggleDetailsButton');
+        const dataSources = document.getElementById('dataSources');
+        toggleButton.addEventListener('click', function () {
+            if (dataSources.style.display === 'none') {
+                dataSources.style.display = 'block';
+                toggleButton.textContent = 'Hide details';
+            } else {
+                dataSources.style.display = 'none';
+                toggleButton.textContent = 'Show details';
+            }
+        });
     });
 
     let parsedCSVData = null; // Store parsed CSV data
@@ -152,10 +161,15 @@ description: Yearly statistics on floods across Europe and beyond.
             }
             else if (row['Country'] && row['OtherCountry']) {
                 // darthmouth data
+                let countryName;
                 if (row['OtherCountry'] == '0')
-                    countrySet.add(row['Country']);
+                    countryName = row['Country'];
                 else
-                    countrySet.add(row['OtherCountry']);
+                    countryName = row['OtherCountry'];
+
+                // Here remove from countryName nbsp
+                countryName = countryName.replace(/&nbsp;/g, ' ');
+                countrySet.add(countryName);
             }
         });
 
@@ -181,6 +195,7 @@ description: Yearly statistics on floods across Europe and beyond.
                                 if (row['Name'] && row['Code']) {
                                     // Check if row['Name'] exists in countrySet
                                     if (countrySet.has(row['Name'])) {
+                                        countrySet.delete(row['Name']);
                                         countryCodesSet.add(row['Code']);
                                         const option = document.createElement('option');
                                         option.value = row['Code'];
@@ -189,6 +204,26 @@ description: Yearly statistics on floods across Europe and beyond.
                                     }
                                 }
                             });
+
+                            // Iterate countrySet and add option for each element, those
+                            // are unknown countries - not present in countries.csv
+                            countrySet.forEach(country => {
+                                const option = document.createElement('option');
+                                option.value = country;
+                                option.textContent = country;
+                                countryFilter.appendChild(option);
+                                console.log('Unknown country:', country);
+                            });
+
+                            // Sort countryFilter by text content
+                            const options = Array.from(countryFilter.options).sort((a, b) => {
+                                if (a.textContent === "All Countries") return -1;
+                                if (b.textContent === "All Countries") return 1;
+                                return a.textContent.localeCompare(b.textContent);
+                            });
+
+                            countryFilter.innerHTML = '';
+                            options.forEach(option => countryFilter.appendChild(option));
 
                             if (lastSelectedCountry && countryCodesSet.has(lastSelectedCountry)) {
                                 countryFilter.value = lastSelectedCountry;
@@ -211,10 +246,12 @@ description: Yearly statistics on floods across Europe and beyond.
         const selectedDataSet = document.getElementById('dataSet').value;
         let filePath = '';
 
+        let encoding = 'UTF-8';
         if (selectedDataSet === 'hanze') {
             filePath = 'data/HANZE/hanze_11259233_Version_v2.1.2_events.csv';
         } else if (selectedDataSet === 'dartmouth') {
             filePath = 'data/dartmouth_flood_observatory/FloodArchive.txt';
+            encoding = 'ISO-8859-1';
         }
 
         fetch(filePath)
@@ -228,12 +265,28 @@ description: Yearly statistics on floods across Europe and beyond.
                 // Parse the CSV using PapaParse
                 Papa.parse(csvText, {
                     header: true,
+                    encoding: encoding,
                     skipEmptyLines: true,
                     complete: function (results) {
                         if (results.errors.length) {
                             console.error("CSV Parsing Errors:", results.errors);
                         } else {
                             parsedCSVData = results.data;
+
+                            // Iterate all the records and data, remove nbsp elements from it
+                            parsedCSVData.forEach(row => {
+                                for (const key in row) {
+                                    if (row[key] && typeof row[key] === 'string') {
+                                        row[key] = row[key].replace(/[^A-Za-z0-9 ]/g, '');
+                                    }
+
+                                    if (key === 'Country' || key === 'OtherCountry') {
+                                        row[key] = row[key].replace(/\.$/g, '');
+                                    }
+                                }
+                            });
+
+
                             loadCountriesFromData(parsedCSVData).then(() => {
                                 // Process data after parsing, this allows to use reselected country
                                 processCSVData(parsedCSVData, selectedDataSet);
@@ -244,11 +297,16 @@ description: Yearly statistics on floods across Europe and beyond.
             })
             .catch(error => {
                 console.error('Error loading the CSV file:', error);
-            });
+            })
+            .then(() => {
+
+            }
+        );
+
     }
 
     function processCSVData(data, dataset) {
-        const yearlyStats = {};
+        const yearlyStats =  {};
         const floodCounts = {};
         const selectedCountry = document.getElementById('countryFilter').value;
         const selectedCountryName = document.querySelector(`#countryFilter option[value="${selectedCountry}"]`).textContent;
@@ -259,11 +317,20 @@ description: Yearly statistics on floods across Europe and beyond.
                 return; // Skip empty line but do not end iteration
             }
 
-            if (selectedCountry !== 'all'
-                && row["Country code"] !== selectedCountry
-                && row["Country"]?.replace(/"/g, '') !== selectedCountryName)
-            {
-                return; // Skip rows that do not match the selected country
+
+            if (selectedCountry !== 'all') {
+                if (dataset === 'hanze') {
+                    if (row["Country code"] !== selectedCountry && row["Country name"] !== selectedCountry) {
+                        return;
+                    }
+                }
+                else if ( dataset === 'dartmouth') {
+                    if (row["Country"] !== selectedCountry && row["OtherCountry"] !== selectedCountry)
+                    {
+                        return; // Skip rows that do not match the selected country
+                    }
+                }
+
             }
 
             let year;
