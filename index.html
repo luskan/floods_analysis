@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-94N7S0P639"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-94N7S0P639');
-    </script>
-
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,6 +65,9 @@
             <li>With questions related to the data, please contact the respective data sources.</li>
             <li>With questions related to this web application, please contact the author: <a href="mailto:marcinje@gmail.com">Marcin Jędrzejewski</a></li>
         </ul>
+        <div>
+        <button class="btn btn-link" onclick="klaro.show()">Change Consent Settings</button>
+        </div>
     </div>
     <div class="d-flex mb-3">
         <select id="dataSet" class="form-select w-auto">
@@ -157,7 +150,36 @@
                 title: 'Google Analytics',
                 purposes: ['analytics'],
                 cookies: ['_ga', '_gat', '_gid'],
-                required: false
+                required: false,
+                callback: function(consent) {
+                    if (consent) {
+                        // Load and run the Google Analytics script when consent is given
+                        if (!document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
+                            var gaScript = document.createElement('script');
+                            gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-94N7S0P639';
+                            gaScript.async = true;
+                            document.head.appendChild(gaScript);
+
+                            // Initialize Google Analytics
+                            gaScript.onload = function() {
+                                window.dataLayer = window.dataLayer || [];
+                                function gtag() { dataLayer.push(arguments); }
+                                gtag('js', new Date());
+                                gtag('config', 'G-94N7S0P639');
+                            };
+                        }
+                    } else {
+                        // Remove the Google Analytics script if it exists
+                        var gaScript = document.querySelector('script[src*="googletagmanager.com/gtag/js"]');
+                        if (gaScript) {
+                            gaScript.parentNode.removeChild(gaScript);
+                            console.log('Google Analytics script removed due to consent withdrawal');
+                        }
+
+                        // Clear the dataLayer to stop tracking
+                        window.dataLayer = [];
+                    }
+                }
             }
         ]
     };
