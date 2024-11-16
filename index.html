@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-94N7S0P639"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-94N7S0P639');
+    </script>
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -135,6 +145,23 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Custom JS -->
+
+<script defer type="application/javascript" src="https://cdn.kiprotect.com/klaro/v0.7.13/klaro.js"></script>
+<script>
+    var klaroConfig = {
+        elementID: 'klaro',
+        privacyPolicy: '/privacy-policy',
+        apps: [
+            {
+                name: 'google-analytics',
+                title: 'Google Analytics',
+                purposes: ['analytics'],
+                cookies: ['_ga', '_gat', '_gid'],
+                required: false
+            }
+        ]
+    };
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
